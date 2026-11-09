@@ -42,7 +42,7 @@ jobs:
         --username=zeus
         --password=zeus_ci
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Validate the changelog
         run: $LIQUIBASE validate
       - name: Apply every migration (dev context)
