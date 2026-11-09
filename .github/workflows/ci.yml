@@ -35,7 +35,7 @@ jobs:
       LIQUIBASE: >-
         docker run --rm --network host
         -v ${{ github.workspace }}:/liquibase/changelog
-        liquibase/liquibase:5.0.4
+        liquibase/liquibase:4.33.0
         --search-path=/liquibase/changelog
         --changelog-file=db.changelog-master.yaml
         --url=jdbc:postgresql://localhost:5432/zeus

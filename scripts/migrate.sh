@@ -17,7 +17,7 @@ if [ -f "$ROOT/.env" ]; then set -a; . "$ROOT/.env"; set +a; fi
 : "${DB_USER:=zeus}"
 : "${DB_PASSWORD:?DB_PASSWORD is required (set it in .env, never commit it)}"
 : "${CONTEXTS:=dev}"
-LIQUIBASE_IMAGE="${LIQUIBASE_IMAGE:-liquibase/liquibase:5.0.4}"
+LIQUIBASE_IMAGE="${LIQUIBASE_IMAGE:-liquibase/liquibase:4.33.0}"
 
 if [ "$#" -eq 0 ]; then set -- update; fi
 
