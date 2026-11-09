@@ -1,0 +1,15 @@
+# Master changelog of the shared database (one schema per service).
+# Rules (see README.md and Docs ADR-023):
+#   - List every file explicitly, in the real execution order. Do not use includeAll:
+#     DML can depend on DDL that comes later in the sequence.
+#   - One file = one changeset, named NNNN-type-description.sql (global sequence).
+#   - A changeset that has been applied is never edited; add a new one.
+databaseChangeLog:
+  - include:
+      file: init/ddl/0001-ddl-create-schema-chat.sql
+      relativeToChangelogFile: true
+  - include:
+      file: init/ddl/0002-ddl-create-chat-app-role.sql
+      relativeToChangelogFile: true
+  # chat schema: add one include per file in chat/ddl, chat/dml and chat/seed,
+  # starting at 0003 (first story that needs a table).

@@ -1,0 +1,53 @@
+name: CI
+
+# The job is called "build" on purpose: the main ruleset requires a check with that name
+# (see Docs 10-devops/repo-protection).
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: zeus
+          POSTGRES_USER: zeus
+          POSTGRES_PASSWORD: zeus_ci   # throwaway database that only lives during this job
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U zeus -d zeus"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      LIQUIBASE: >-
+        docker run --rm --network host
+        -v ${{ github.workspace }}:/liquibase/changelog
+        liquibase/liquibase:5.0.4
+        --search-path=/liquibase/changelog
+        --changelog-file=db.changelog-master.yaml
+        --url=jdbc:postgresql://localhost:5432/zeus
+        --username=zeus
+        --password=zeus_ci
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate the changelog
+        run: $LIQUIBASE validate
+      - name: Apply every migration (dev context)
+        run: $LIQUIBASE --contexts=dev update
+      - name: Roll every migration back
+        run: $LIQUIBASE rollback-count --count=1000
+      - name: Apply again from scratch
+        run: $LIQUIBASE --contexts=dev update
